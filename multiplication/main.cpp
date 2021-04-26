@@ -23,7 +23,7 @@ int multiply1(int a, int n)
 
 int main()
 {
-    int a{4};
+    int a=4;
     //std::cout << half(a) << '\n';
     //std::cout << odd(a) << '\n'; // bool true is 1 ,false is zero
     std::cout << "The sum of 3 and 4 is " << add(3, 4) << '\n';

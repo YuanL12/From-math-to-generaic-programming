@@ -24,9 +24,9 @@ return sum; }
 
 int main()
 {
-    //ploynomial multiplication
+    //polynomial multiplication
     //eg., 4x^4+7x^3−x^2+27x−3 = (((4x+7)x−1)x+27)x−3
-    //Horner's rule: nerver have to multiply powers of x higher than 1
+    //Horner's rule: never have to multiply powers of x higher than 1
     std::vector<int> polynomial_coefficient = {4,7,-1,27,3};
     double x = 1.0; 
     double f_x = polynomial_value(polynomial_coefficient.begin(),polynomial_coefficient.end(), 1); 
