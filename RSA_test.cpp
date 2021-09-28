@@ -3,12 +3,8 @@
 #include <random>
 #include <chrono>
 #include <vector>
-#include "prime.hpp"
+#include "include/RSA.hpp"
 #include <tuple>
-
-
-
-
 
 int main()
 {
@@ -50,9 +46,12 @@ int main()
 
     auto RSA_info = RSA_generation_lib<int>();
     std::cout << "n = "<< RSA_info.n << ", pub_key = "<< RSA_info.pub_key << ", prv_key = " << RSA_info.prv_key << std::endl;
-    return 0;
 
-    // for(int i = 0 ; i < 5; i++){
-    //     std::cout << random_number<int>() << std::endl;
-    // }
+    int message = 30;
+    std::cout << "message is "<< message << std::endl;
+
+    std::cout << "encoded message is "<< RSA_info.encode(message) << std::endl;    
+    std::cout << "decoded message is "<<RSA_info.decode(RSA_info.encode(message)) << std::endl;   
+
+    return 0;
 }

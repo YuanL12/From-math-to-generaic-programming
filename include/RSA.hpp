@@ -70,7 +70,7 @@ std::pair<E, E> extended_gcd(E a, E b) {
     return {x0, a};
 }
 
-// return the multiplicative inverse of a in Z mod n
+// compute the multiplicative inverse of a in Z mod n
 template <Integer I>
 I multiplicative_inverse(I a, I n) {
     std::pair<I, I> p = extended_gcd(a, n);
@@ -79,6 +79,8 @@ I multiplicative_inverse(I a, I n) {
     return p.first;
 }
 
+
+// compute the r * a^n
 template <Regular A, Integer N, SemigroupOperation Op> // requires (Domain<Op, A>)
 A power_accumulate_semigroup(A r, A a, N n, Op op) {
     // precondition(n >= 0);
@@ -93,25 +95,55 @@ A power_accumulate_semigroup(A r, A a, N n, Op op) {
     }
 }
 
+// compute a^n with the group operation Op
 template <Regular A, Integer N, SemigroupOperation Op> // requires (Domain<Op, A>)
 A power_semigroup(A a, N n, Op op) {
     // precondition(n > 0);
-    while (!odd(n)) {
+    while (!odd(n)) { // if n is even 
         a = op(a, a);
-        n = half(n); 
+        n = half(n);
     }
     if (n == 1) return a;
     return power_accumulate_semigroup(a, op(a, a), half(n - 1), op);
 }
 
-// modulo structure used to compute modulo_multiplication
+
+// Returns (a * b) % mod
+long long moduloMultiplication(long long a,
+                            long long b,
+                            long long mod)
+{
+    long long res = 0; // Initialize result
+ 
+    // Update a if it is more than
+    // or equal to mod
+    a %= mod;
+ 
+    while (b)
+    {
+        // If b is odd, add a with result
+        if (b & 1)
+            res = (res + a) % mod;
+ 
+        // Here we assume that doing 2*a
+        // doesn't cause overflow
+        a = (2 * a) % mod;
+ 
+        b >>= 1; // b = b / 2
+    }
+ 
+    return res;
+}
+
+// modulo structure used to do modulo multiplication
 template <Integer I>
-struct modulo_multiply {
+struct modulo_multiply{
     I modulus;
     modulo_multiply(const I& i) : modulus(i) {}
 
+    // compute n * m mod modulus
     I operator() (const I& n, const I& m) const {
-        return (n * m) % modulus;
+        return moduloMultiplication(n, m, modulus);
     } 
 };
 
@@ -251,7 +283,7 @@ public:
         // generate two prime random numbers
         p1 = random_prime_number<E>();
         p2 = random_prime_number<E>();
-        // set the valus of n and euler function number
+        // set the values of n and euler function number
         n = p1*p2; 
         euler_func = (p1-1)*(p2-1);
 
@@ -265,5 +297,20 @@ public:
         // compute the private key
         prv_key = multiplicative_inverse(pub_key, euler_func);
     }
+    
+    // return n
+    E get_n(){
+        return n;
+    }
 
+    // compute the encoded message by powering them
+    E encode(E message){
+        return power_semigroup(message, pub_key, modulo_multiply<E>(n));
+    }
+
+    // compute the decoded message by powering them
+    E decode(E message){
+        // E result = power_semigroup(message, RSA_info.prv_key, modulo_multiply<E>(RSA_info.n));
+        return power_semigroup(message, prv_key, modulo_multiply<E>(n));
+    }
 };
